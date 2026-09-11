@@ -1,4 +1,4 @@
-const API = "https://zamzamcafe-production.up.railway.app/api";
+const API = import.meta.env.VITE_API_URL || "https://zamzamcafe-backend-production.up.railway.app/api";
 
 async function request(path, options = {}) {
   const res = await fetch(`${API}${path}`, {

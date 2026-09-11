@@ -51,7 +51,7 @@ export default function App() {
   const available = products.filter(p => p.available !== false);
   const cartCount = cart.reduce((a, i) => a + i.qty, 0);
   const subtotal = cart.reduce((a, i) => a + i.price * i.qty, 0);
-  const deliveryFee = subtotal >= 2000 ? 0 : subtotal ? 150 : 0;
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee;
 
   function addToCart(product) {
