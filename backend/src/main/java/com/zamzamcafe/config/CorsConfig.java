@@ -16,7 +16,8 @@ public class CorsConfig implements WebMvcConfigurer {
             "http://127.0.0.1:3000",
             "https://zamzamcafe-83ulqay45-subhan-572f.vercel.app",
             "https://zamzam-cafe-layduu2et-subhan-572f.vercel.app",
-            "https://zamzam-cafe-git-main-subhan-572f.vercel.app"
+            "https://zamzam-cafe-git-main-subhan-572f.vercel.app",
+            "https://zamzam-cafe-bkfs9aqbp-subhan-572f.vercel.app"
         )
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
         .allowedHeaders("Content-Type", "Accept", "Authorization");
