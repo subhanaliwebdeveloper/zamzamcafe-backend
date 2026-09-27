@@ -1,47 +1,66 @@
-const USERS_KEY = "zzc_users";
 const SESSION_KEY = "zzc_session";
+const TOKEN_KEY = "zzc_token";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const defaultUsers = [
-  { id: "admin-1", name: "Admin", email: "admin@zamzamcafe.com", password: "admin123", role: "ADMIN" }
-];
+export async function register(name, email, password, phone, address) {
+  const res = await fetch(`${API}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password, phone, address })
+  });
 
-function readUsers() {
-  let saved;
+  const text = await res.text();
+  let data;
   try {
-    saved = JSON.parse(localStorage.getItem(USERS_KEY) || "null");
+    data = JSON.parse(text);
   } catch {
-    saved = null;
+    throw new Error("Server returned an invalid response.");
   }
-  if (!Array.isArray(saved)) saved = null;
-  if (!saved) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(defaultUsers));
-    return defaultUsers;
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Registration failed");
   }
-  return saved;
+
+  if (data.token) {
+    localStorage.setItem(TOKEN_KEY, data.token);
+  }
+  if (data.user) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+  }
+  return data.user;
 }
 
-export function register(name, email, password, phone, address) {
-  const users = readUsers();
-  const normalized = email.trim().toLowerCase();
-  if (users.some(u => u.email === normalized)) throw new Error("Email already registered.");
-  const user = { id: crypto.randomUUID(), name: name.trim(), email: normalized, password, phone: phone.trim(), address: address.trim(), role: "CUSTOMER" };
-  users.push(user);
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  const safe = { id: user.id, name: user.name, email: user.email, phone: user.phone || "", address: user.address || "", role: user.role };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(safe));
-  return safe;
-}
+export async function login(email, password) {
+  const res = await fetch(`${API}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
 
-export function login(email, password) {
-  const user = readUsers().find(u => u.email === email.trim().toLowerCase() && u.password === password);
-  if (!user) throw new Error("Invalid email or password.");
-  const safe = { id: user.id, name: user.name, email: user.email, phone: user.phone || "", address: user.address || "", role: user.role };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(safe));
-  return safe;
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error("Server returned an invalid response.");
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Invalid email or password");
+  }
+
+  if (data.token) {
+    localStorage.setItem(TOKEN_KEY, data.token);
+  }
+  if (data.user) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+  }
+  return data.user;
 }
 
 export function logout() {
   localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 }
 
 export function getSession() {
@@ -52,4 +71,8 @@ export function getSession() {
     localStorage.removeItem(SESSION_KEY);
     return null;
   }
+}
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || "";
 }

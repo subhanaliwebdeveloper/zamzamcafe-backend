@@ -1,8 +1,17 @@
-const API = import.meta.env.VITE_API_URL || "https://zamzamcafe-backend-production.up.railway.app/api"
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+function getAuthHeaders() {
+  const token = localStorage.getItem("zzc_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 async function request(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+      ...(options.headers || {})
+    },
     ...options
   });
   if (!res.ok) {
@@ -26,6 +35,28 @@ async function request(path, options = {}) {
   }
 }
 
+export async function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const headers = { ...getAuthHeaders() };
+  const res = await fetch(`${API}/upload`, {
+    method: "POST",
+    headers,
+    body: formData
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    let message = text;
+    try {
+      const body = text ? JSON.parse(text) : null;
+      message = body?.error || body?.message || text;
+    } catch {}
+    throw new Error(message || `Upload failed: ${res.status}`);
+  }
+  const data = await res.json();
+  return data.imageUrl;
+}
+
 export const getProducts = () => request("/products").then(products => products || []);
 export const createProduct = (product) => request("/products", { method: "POST", body: JSON.stringify(product) });
 export const updateProduct = (id, product) => request(`/products/${id}`, { method: "PUT", body: JSON.stringify(product) });
@@ -35,3 +66,5 @@ export const getOrders = () => request("/orders").then(orders => orders || []);
 export const getOrdersByPhone = (phone) => request(`/orders?phone=${encodeURIComponent(phone || "")}`).then(orders => orders || []);
 export const deleteOrder = (id) => request(`/orders/${id}`, { method: "DELETE" });
 export const updateOrderStatus = (id, status) => request(`/orders/${id}/status?status=${encodeURIComponent(status)}`, { method: "PUT" });
+export const getDeliveryFee = (coordsOrDistance) => request("/delivery-fee", { method: "POST", body: JSON.stringify(coordsOrDistance) });
+export const getCafeLocation = () => request("/delivery-fee/cafe-location");

@@ -1,16 +1,16 @@
-ZAM ZAM CAFE - FINAL WORKING BUNDLE
+ZAM ZAM CAFE - FULL STACK APPLICATION
 
-1) Extract this ZIP.
-2) Double-click START-ZAMZAM.bat.
-3) It starts the local Spring Boot backend and React frontend in separate windows.
-4) The frontend is already connected to the Railway backend by default:
-   https://zamzamcafe-backend-production.up.railway.app/api
-5) For Vercel, deploy ONLY the frontend folder.
-   Root Directory: frontend
-   Build Command: npm run build
-   Output Directory: dist
+Tech Stack:
+- Backend: Node.js + Express.js + MongoDB (Mongoose) + Cloudinary + JWT + bcryptjs
+- Frontend: React + Vite + Vanilla CSS
 
-Delivery charges are set to FREE (0) in both frontend and backend.
+Quick Start:
+1) In backend/.env, configure your MongoDB URI and Cloudinary credentials.
+2) Double-click START-ZAMZAM.bat to start both backend and frontend.
+   - Backend runs on: http://localhost:5000
+   - Frontend runs on: http://localhost:5173
 
-If Maven is not installed, the local backend window may fail, but the frontend
-will still use the Railway backend.
+Default Admin Credentials:
+- Email: admin@zamzamcafe.com
+- Password: admin123
+(Can be changed in backend/.env)
